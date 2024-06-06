@@ -32,7 +32,7 @@ public class KafkaConfig {
 		// Returning message in JSON format
 		return new DefaultKafkaConsumerFactory<>(config);
 	}
-	
+	@Bean(name="examenListener")
 	 public ConcurrentKafkaListenerContainerFactory 
 	    concurrentKafkaListenerContainerFactory() 
 	    { 
