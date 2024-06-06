@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -13,12 +14,14 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
+import es.curso.cola.Examen;
+
 @Configuration
 @EnableKafka
 public class KafkaConfig {
 
 	@Bean
-	public ConsumerFactory<String, String> consumerFactory() {
+	public ConsumerFactory<String, Examen> consumerFactory() {
 
 		// Creating a map of string-object type
 		Map<String, Object> config = new HashMap<>();
@@ -28,16 +31,18 @@ public class KafkaConfig {
 		config.put(ConsumerConfig.GROUP_ID_CONFIG, "grupo1");
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+		JsonDeserializer<Examen> deserializer=new JsonDeserializer<Examen>(Examen.class);
+		deserializer.addTrustedPackages("es.curso.cola");
 
 		// Returning message in JSON format
-		return new DefaultKafkaConsumerFactory<>(config);
+		return new DefaultKafkaConsumerFactory<>(config,new StringDeserializer(),deserializer);
 	}
 	@Bean(name="examenListener")
 	 public ConcurrentKafkaListenerContainerFactory 
 	    concurrentKafkaListenerContainerFactory() 
 	    { 
 	        ConcurrentKafkaListenerContainerFactory< 
-	            String, String> factory 
+	            String, Examen> factory 
 	            = new ConcurrentKafkaListenerContainerFactory<>(); 
 	        factory.setConsumerFactory(consumerFactory()); 
 	        return factory; 
